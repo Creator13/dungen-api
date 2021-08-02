@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 
 const dbPool = require("../modules/db");
+const {ensureServerAuthenticated} = require("../modules/auth");
 
 const saltRounds = 5;
 const router = express.Router();
@@ -29,41 +30,45 @@ router.get("/highscoreList", async (req, res) => {
     }
 });
 
-router.post("/api/newUser", async (req, res) => {
+router.post("/newUser", async (req, res) => {
     const email = req.body.email;
     const nickname = req.body.name;
     const password = req.body.password;
 
+    // Check if email address exists in database
+    const [emails] = await dbPool.execute("SELECT email FROM users WHERE email = ?", [email]);
+    if (emails.length > 0) {
+        res.status(400);
+        res.send({error: "Email already exists"});
+        return;
+    }
+
     bcrypt.hash(password, saltRounds, async (err, passHash) => {
         if (err) {
             console.log(err);
-        } else {
-            try {
-                // Check if email address exists in database
-                const [emails] = await dbPool.execute("SELECT email FROM users WHERE email = ?", [email]);
-                if (emails.length > 0) {
-                    res.status(400);
-                    res.send({error: "Email already exists"});
+            return;
+        }
 
-                    return;
-                }
+        try {
+            await dbPool.execute(
+                "INSERT INTO users (nickname, password, email) VALUES (?, ?, ?)",
+                [nickname, passHash, email]
+            );
 
-                await dbPool.execute(
-                    "INSERT INTO users (nickname, password, email) VALUES (?, ?, ?)",
-                    [nickname, passHash, email]
-                );
+            // Confirm insertion to requester
+            res.status(201);
+            res.send();
+        } catch (err) {
+            console.log(err);
 
-                // Confirm insertion to requester
-                res.status(201);
-                res.send();
-            } catch (err) {
-                console.log(err);
-
-                res.status(500);
-                res.send({error: err.toString()});
-            }
+            res.status(500);
+            res.send({error: err.toString()});
         }
     });
+});
+
+router.post("/addHighscore", ensureServerAuthenticated, async (req, res) => {
+    req
 });
 
 module.exports = router;

@@ -1,0 +1,1 @@
+module.exports.gameServerPassword = "[3[uhku@&890<.34*$dskdd1opil[f]]#(";
