@@ -12,25 +12,24 @@ router.get("/highscore-list", async (req, res) => {
 
     console.log(`${req.ip} requested ${count ? count : "all"} highscore entries`);
 
+    const baseQuery = "SELECT u.nickname, h.time, h.score FROM users AS u, highscores AS h WHERE u.uid = h.user_id ORDER BY h.score DESC, h.time DESC";
+
     try {
         let rows;
         if (count) {
             [rows] = await dbPool.execute(
-                `SELECT u.nickname, h.time, h.score FROM users AS u, highscores AS h WHERE u.uid = h.user_id ORDER BY h.score DESC LIMIT ?`,
+                `${baseQuery} LIMIT ?`,
                 [count]
             );
         } else {
-            [rows] = await dbPool.execute(
-                `SELECT u.nickname, h.time, h.score FROM users AS u, highscores AS h WHERE u.uid = h.user_id ORDER BY h.score DESC`
-            );
+            [rows] = await dbPool.execute(baseQuery);
         }
 
         res.send(rows);
     } catch (e) {
         console.log(e.toString());
 
-        res.status(500);
-        res.send(e.toString());
+        res.sendStatus(500);
     }
 });
 
