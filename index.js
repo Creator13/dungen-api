@@ -3,9 +3,9 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const {ensureUserAuthenticated, ensureServerAuthenticated} = require("./modules/auth");
+const path = require('path');
 
 const port = process.env.PORT || 80;
-
 const app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -18,6 +18,8 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(express.static(path.join(__dirname, "static")));
 
 app.use('/login', require("./routes/login"));
 app.use('/api', require("./routes/api"));

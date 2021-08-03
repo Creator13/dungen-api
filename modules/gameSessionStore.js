@@ -1,5 +1,5 @@
-// const lifetime = 10 * 60 * 1000;
-const lifetime = 10 * 1000;
+const lifetime = 10 * 60 * 1000;
+// const lifetime = 10 * 1000;
 
 const store = {};
 
