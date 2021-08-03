@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const {gameServerPassword} = require('../secrets');
 const gameSessionStore = require('../modules/gameSessionStore');
@@ -27,20 +28,19 @@ router.post("/player", async (req, res, next) => {
 });
 
 router.get("/start-game-session", async (req, res) => {
-    const sessionId = Date.now();
+    const sessionId = crypto.randomInt(1, 2147483647);
 
     bcrypt.hash(gameServerPassword + sessionId, 5, (err, hash) => {
         if (err) {
             console.log(err);
-            res.status(500);
-            res.send();
+            res.sendStatus(500);
             return;
         }
 
         // In-memory storage as a js object: Fast and scalable? absolutely not. Do I care? not really.
-        gameSessionStore[sessionId] = {password: hash, isServer: true};
+        gameSessionStore[sessionId] = {password: hash, created: Date.now()};
 
-        res.send({id: sessionId});
+        res.send(sessionId.toString());
     });
 });
 
@@ -51,8 +51,7 @@ router.post("/server", async (req, res, next) => {
         }
 
         if (!user) {
-            res.status(401);
-            return res.send();
+            return res.sendStatus(401);
         }
         req.logIn(user, function (err) {
             if (err) {
@@ -64,7 +63,11 @@ router.post("/server", async (req, res, next) => {
     })(req, res, next);
 });
 
-router.post("/logout", (req, res) => {
+router.get("/logout", (req, res) => {
+    if (req.user && req.user.isServer) {
+        delete gameSessionStore[req.user.id];
+    }
+
     req.logout();
     res.send();
 });

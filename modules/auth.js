@@ -51,7 +51,7 @@ passport.use('local-user', new LocalStrategy(
 
 passport.use('local-server', new LocalStrategy(
     {usernameField: "game-session"},
-    async function (session, password, done) {
+    function (session, password, done) {
         if (sessions[session] !== undefined) {
             bcrypt.compare(password + session, sessions[session].password, (err, result) => {
                 if (err) {
@@ -59,7 +59,15 @@ passport.use('local-server', new LocalStrategy(
                 }
 
                 if (result) {
-                    return done(null, {id: session});
+                    const gameServer = {
+                        id: session,
+                        password: sessions[session].password,
+                        isServer: true
+                    };
+
+                    sessions[session] = gameServer;
+
+                    return done(null, gameServer);
                 } else {
                     return done(null, false);
                 }

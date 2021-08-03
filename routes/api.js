@@ -7,7 +7,7 @@ const {ensureServerAuthenticated} = require("../modules/auth");
 const saltRounds = 5;
 const router = express.Router();
 
-router.get("/highscoreList", async (req, res) => {
+router.get("/highscore-list", async (req, res) => {
     let count = 10;
     if (req.query.count !== undefined) {
         count = req.query.count;
@@ -67,8 +67,27 @@ router.post("/newUser", async (req, res) => {
     });
 });
 
-router.post("/addHighscore", ensureServerAuthenticated, async (req, res) => {
-    req
+router.post("/add-highscore", ensureServerAuthenticated, async (req, res) => {
+    if (!req.body.user_id || !req.body.score) {
+        res.sendStatus(400);
+    }
+
+    const userId = req.body.user_id;
+    const highscore = req.body.score;
+
+    try {
+        await dbPool.execute("INSERT INTO highscores (user_id, time, score) VALUES (?, ?, ?)",
+            [userId, Date.now(), highscore]
+        );
+
+        res.sendStatus(201);
+    }
+    catch (err) {
+        console.log(err);
+
+        res.status(500);
+        res.send({error: err.toString()})
+    }
 });
 
 module.exports = router;
