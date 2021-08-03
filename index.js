@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const {ensureUserAuthenticated, ensureServerAuthenticated} = require("./modules/auth");
 const path = require('path');
@@ -8,8 +7,8 @@ const path = require('path');
 const port = process.env.PORT || 80;
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 app.use(session({
     secret: "89dj2389edkwejsajdfker5-0ul<<sdd",
     saveUninitialized: true,
