@@ -12,11 +12,12 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "node-env-run": "^4.0.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "node index.js",
-    "develop": "nodemon index.js",
+    "develop": "nodenv index.js --exec \"nodemon\"",
     "start": "node index.js"
   },
   "author": "",
