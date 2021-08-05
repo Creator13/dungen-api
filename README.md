@@ -45,4 +45,4 @@
         error: string
     }
     ```
-- `POST /api/add-highscore`: Creates a new highscore entry. Required fields: `user_id` a uid that exists in the database, and `score`. 
+- `POST /api/add-highscore`: Creates a new highscore entry. Required fields: `user_id` a uid that exists in the database, and `score`. **Game server authentication required**.
