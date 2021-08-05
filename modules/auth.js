@@ -53,7 +53,7 @@ passport.use('local-server', new LocalStrategy(
     {usernameField: "game-session"},
     function (session, password, done) {
         if (sessions[session] !== undefined) {
-            bcrypt.compare(password + session, sessions[session].password, (err, result) => {
+            bcrypt.compare(password, sessions[session].password, (err, result) => {
                 if (err) {
                     return done(err);
                 }
@@ -96,8 +96,8 @@ passport.deserializeUser((id, done) => {
 
 module.exports.ensureUserAuthenticated = function (req, res, next) {
     if (!req.user) {
-        res.status(401);
-        res.send("Unauthorized");
+        // not authenticated
+        res.sendStatus(401);
         return;
     }
 
@@ -105,15 +105,15 @@ module.exports.ensureUserAuthenticated = function (req, res, next) {
         next();
     }
     else {
-        res.status(403);
-        res.send("Forbidden");
+        // Authenticated but not authorized
+        res.sendStatus(403);
     }
 };
 
 module.exports.ensureServerAuthenticated = function (req, res, next) {
     if (!req.user) {
-        res.status(401);
-        res.send("Unauthorized");
+        // not authenticated
+        res.sendStatus(401);
         return;
     }
 
@@ -121,7 +121,7 @@ module.exports.ensureServerAuthenticated = function (req, res, next) {
         next();
     }
     else {
-        res.status(403);
-        res.send("Forbidden");
+        // Authenticated but not authorized
+        res.sendStatus(403);
     }
 };

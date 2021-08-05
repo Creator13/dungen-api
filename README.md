@@ -14,7 +14,7 @@
     ```
 - `POST /login/server`: authentication route for game servers. Required fields: `game-session` (retrieved via the `start-game-session` route) and `password` (in plain text).
 - `GET /login/start-game-session`: provides a new game server authentication token.
-- `GET /login/logout`: Logs out either the server or the lpayer that's logged in on the session cookie.
+- `GET /login/logout`: Logs out either the server or the player that's logged in on the session cookie.
 
 ### API
 - `GET /api/highscore-list?count={count}`: returns a list of all highscores recorded in the database sorted from highest to lowest, and by date. Optional query parameter `count` limits the number of scores included. Shape: 
