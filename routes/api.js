@@ -38,7 +38,7 @@ router.post("/new-user", async (req, res) => {
     const nickname = req.body.name;
     const password = req.body.password;
 
-    if (email === undefined || nickname === undefined || password === undefined) {
+    if (!email || !nickname || !password) {
         res.status(400);
         res.send({error: "Not all fields were present"});
         return;
@@ -65,8 +65,7 @@ router.post("/new-user", async (req, res) => {
             );
 
             // Confirm insertion to requester
-            res.status(201);
-            res.send();
+            res.sendStatus(201);
         } catch (err) {
             console.log(err);
 
@@ -77,12 +76,12 @@ router.post("/new-user", async (req, res) => {
 });
 
 router.post("/add-highscore", ensureServerAuthenticated, async (req, res) => {
-    if (!req.body.user_id || !req.body.score) {
-        res.sendStatus(400);
-    }
-
     const userId = req.body.user_id;
     const highscore = req.body.score;
+
+    if (!userId || !highscore) {
+        res.sendStatus(400);
+    }
 
     try {
         await dbPool.execute("INSERT INTO highscores (user_id, time, score) VALUES (?, ?, ?)",
